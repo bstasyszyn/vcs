@@ -34,6 +34,7 @@ import (
 
 	"github.com/trustbloc/vcs/component/otp"
 	"github.com/trustbloc/vcs/pkg/ld"
+	"github.com/trustbloc/vcs/pkg/observability/tracing"
 	"github.com/trustbloc/vcs/pkg/service/requestobject"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/claimdatastore"
 	requestobjectstore2 "github.com/trustbloc/vcs/pkg/storage/s3/requestobjectstore"
@@ -135,6 +136,11 @@ func createStartCmd(opts ...StartOpts) *cobra.Command {
 			conf, err := prepareConfiguration(params)
 			if err != nil {
 				return fmt.Errorf("failed to prepare configuration: %w", err)
+			}
+
+			_, _, err = tracing.Initialize(params.tracingParams.provider, params.tracingParams.serviceName, params.tracingParams.collectorURL)
+			if err != nil {
+				return fmt.Errorf("initialize tracing: %w", err)
 			}
 
 			var e *echo.Echo
