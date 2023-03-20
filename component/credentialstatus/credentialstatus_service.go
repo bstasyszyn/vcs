@@ -18,6 +18,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	vdrapi "github.com/hyperledger/aries-framework-go/pkg/framework/aries/api/vdr"
 	"github.com/piprate/json-gold/ld"
@@ -34,6 +37,10 @@ import (
 	profileapi "github.com/trustbloc/vcs/pkg/profile"
 	"github.com/trustbloc/vcs/pkg/restapi/resterr"
 	"github.com/trustbloc/vcs/pkg/service/credentialstatus"
+	credentialstatustypes "github.com/trustbloc/vcs/pkg/service/credentialstatus"
+	"github.com/trustbloc/vcs/pkg/storage/mongodb"
+	cslstoremongodb "github.com/trustbloc/vcs/pkg/storage/mongodb/cslstore"
+	cslstores3 "github.com/trustbloc/vcs/pkg/storage/s3/cslstore"
 )
 
 const (
@@ -70,11 +77,19 @@ type kmsRegistry interface {
 	GetKeyManager(config *vcskms.Config) (vcskms.VCSKeyManager, error)
 }
 
+type CSLStoreConfig struct {
+	Type          string
+	S3Bucket      string
+	S3Region      string
+	S3HostName    string
+	MongoDBClient *mongodb.Client
+}
+
 type Config struct {
 	HTTPClient     httpClient
 	RequestTokens  map[string]string
 	VDR            vdrapi.Registry
-	CSLStore       credentialstatus.CSLStore
+	CSLStoreConfig *CSLStoreConfig
 	VCStatusStore  vcStatusStore
 	ListSize       int
 	Crypto         vcCrypto
@@ -102,11 +117,16 @@ type Service struct {
 
 // New returns new Credential Status service.
 func New(config *Config) (*Service, error) {
+	cslStore, err := createCredentialStatusListStore(config.CSLStoreConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Service{
 		httpClient:     config.HTTPClient,
 		requestTokens:  config.RequestTokens,
 		vdr:            config.VDR,
-		cslStore:       config.CSLStore,
+		cslStore:       cslStore,
 		vcStatusStore:  config.VCStatusStore,
 		listSize:       config.ListSize,
 		crypto:         config.Crypto,
@@ -587,4 +607,20 @@ func (s *Service) updateVCStatus(ctx context.Context, typedID *verifiable.TypedI
 	}
 
 	return nil
+}
+
+func createCredentialStatusListStore(config *CSLStoreConfig) (credentialstatustypes.CSLStore, error) {
+	cslStoreMongo := cslstoremongodb.NewStore(config.MongoDBClient)
+
+	switch strings.ToLower(config.Type) {
+	case "s3":
+		ses, err := session.NewSession(&aws.Config{Region: aws.String(config.S3Region)})
+		if err != nil {
+			return nil, err
+		}
+
+		return cslstores3.NewStore(s3.New(ses), cslStoreMongo, config.S3Bucket, config.S3Region, config.S3HostName), nil
+	default:
+		return cslStoreMongo, nil
+	}
 }

@@ -82,7 +82,6 @@ import (
 	"github.com/trustbloc/vcs/pkg/service/wellknown"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/claimdatastore"
-	cslstoremongodb "github.com/trustbloc/vcs/pkg/storage/mongodb/cslstore"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/oidc4cistatestore"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/oidc4cistore"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/oidc4vpclaimsstore"
@@ -91,7 +90,6 @@ import (
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/requestobjectstore"
 	"github.com/trustbloc/vcs/pkg/storage/mongodb/vcstatusstore"
 	"github.com/trustbloc/vcs/pkg/storage/s3/credentialoffer"
-	cslstores3 "github.com/trustbloc/vcs/pkg/storage/s3/cslstore"
 	requestobjectstore2 "github.com/trustbloc/vcs/pkg/storage/s3/requestobjectstore"
 )
 
@@ -399,16 +397,6 @@ func buildEchoHandler(
 
 	vcCrypto := crypto.New(conf.VDR, documentLoader)
 
-	cslStore, err := createCredentialStatusListStore(
-		conf.StartupParameters.cslStoreType,
-		conf.StartupParameters.cslStoreS3Region,
-		conf.StartupParameters.cslStoreS3Bucket,
-		conf.StartupParameters.cslStoreS3HostName,
-		mongodbClient)
-	if err != nil {
-		return nil, err
-	}
-
 	var statusListVCSvc credentialstatustypes.ServiceInterface
 
 	statusListVCSvc, err = credentialstatus.New(&credentialstatus.Config{
@@ -416,7 +404,13 @@ func buildEchoHandler(
 		HTTPClient:     getHTTPClient(metricsProvider.ClientCredentialStatus),
 		RequestTokens:  conf.StartupParameters.requestTokens,
 		DocumentLoader: documentLoader,
-		CSLStore:       cslStore,
+		CSLStoreConfig: &credentialstatus.CSLStoreConfig{
+			Type:          conf.StartupParameters.cslStoreType,
+			S3Bucket:      conf.StartupParameters.cslStoreS3Bucket,
+			S3Region:      conf.StartupParameters.cslStoreS3Region,
+			S3HostName:    conf.StartupParameters.cslStoreS3HostName,
+			MongoDBClient: mongodbClient,
+		},
 		VCStatusStore:  vcstatusstore.NewStore(mongodbClient),
 		ListSize:       cslSize,
 		ProfileService: issuerProfileSvc,
@@ -733,28 +727,6 @@ func createCredentialOfferStore(
 	}
 
 	return credentialoffer.NewStore(s3.New(ses), s3Bucket, s3Region, s3HostName), nil
-}
-
-func createCredentialStatusListStore(
-	repoType string,
-	s3Region string,
-	s3Bucket string,
-	hostName string,
-	mongoDbClient *mongodb.Client,
-) (credentialstatustypes.CSLStore, error) {
-	cslStoreMongo := cslstoremongodb.NewStore(mongoDbClient)
-
-	switch strings.ToLower(repoType) {
-	case "s3":
-		ses, err := session.NewSession(&aws.Config{Region: aws.String(s3Region)})
-		if err != nil {
-			return nil, err
-		}
-
-		return cslstores3.NewStore(s3.New(ses), cslStoreMongo, s3Bucket, s3Region, hostName), nil
-	default:
-		return cslStoreMongo, nil
-	}
 }
 
 func newHTTPClient(tlsConfig *tls.Config, params *startupParameters,
