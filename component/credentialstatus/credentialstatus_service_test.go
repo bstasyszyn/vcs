@@ -101,7 +101,7 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 
 		cslIndexStore := newMockCSLIndexStore()
 
-		listID, err := cslIndexStore.GetLatestListID(ctx)
+		listID, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 
 		vcStatusStore := newMockVCStatusStore()
@@ -129,7 +129,7 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		validateVCStatus(t, s, statusID, listID)
 
 		// List size equals 2, so after 2 issuances CSL encodedBitString is full and listID must be updated.
-		updatedListID, err := cslIndexStore.GetLatestListID(ctx)
+		updatedListID, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
@@ -142,7 +142,7 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		validateVCStatus(t, s, statusID, updatedListID)
 
 		// List size equals 2, so after 4 issuances CSL encodedBitString is full and listID must be updated.
-		updatedListIDSecond, err := cslIndexStore.GetLatestListID(ctx)
+		updatedListIDSecond, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
@@ -227,7 +227,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 			&vdrmock.MockVDRegistry{ResolveValue: createDIDDoc("did:test:abc")}, loader)
 		ctx := context.Background()
 
-		listID, err := cslIndexStore.GetLatestListID(ctx)
+		listID, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 
 		mockEventPublisher := &mockedEventPublisher{
@@ -269,7 +269,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 
 		require.NoError(t, s.UpdateVCStatus(ctx, params))
 
-		listID, err = cslIndexStore.GetLatestListID(ctx)
+		listID, err = cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 
 		statusListVC, err := s.GetStatusListVC(ctx, externalProfileID, string(listID))
@@ -662,7 +662,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 			vc.StatusList2021VCStatus,
 			true))
 
-		listID, err := cslIndexStore.GetLatestListID(context.Background())
+		listID, err := cslIndexStore.GetLatestListID(context.Background(), "")
 		require.NoError(t, err)
 
 		revocationListVC, err := s.GetStatusListVC(context.Background(), externalProfileID, string(listID))
@@ -850,14 +850,14 @@ func (m *mockCSLIndexStore) createLatestListID() error {
 	return nil
 }
 
-func (m *mockCSLIndexStore) UpdateLatestListID(ctx context.Context, id credentialstatus.ListID) error {
+func (m *mockCSLIndexStore) UpdateLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	if m.updateLatestListIDErr != nil {
-		return m.updateLatestListIDErr
+		return "", m.updateLatestListIDErr
 	}
-	return m.createLatestListID()
+	return "", m.createLatestListID()
 }
 
-func (m *mockCSLIndexStore) GetLatestListID(ctx context.Context) (credentialstatus.ListID, error) {
+func (m *mockCSLIndexStore) GetLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	if m.getLatestListIDErr != nil {
 		return "", m.getLatestListIDErr
 	}

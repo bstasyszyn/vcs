@@ -88,18 +88,21 @@ func (p *Store) Get(ctx context.Context, cslURL string) (*credentialstatus.CSLIn
 	return cslWrapper, nil
 }
 
-func (p *Store) UpdateLatestListID(ctx context.Context, id credentialstatus.ListID) error {
+func (p *Store) UpdateLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	collection := p.mongoClient.Database().Collection(cslIndexStoreName)
+
+	newListID := credentialstatus.ListID(uuid.NewString())
+
 	_, err := collection.UpdateByID(ctx, latestListIDDBEntryKey, bson.M{
 		"$set": latestListIDDocument{
-			ListID: string(id),
+			ListID: string(newListID),
 		},
 	})
 
-	return err
+	return newListID, err
 }
 
-func (p *Store) GetLatestListID(ctx context.Context) (credentialstatus.ListID, error) {
+func (p *Store) GetLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	collection := p.mongoClient.Database().Collection(cslIndexStoreName)
 
 	mongoDBDocument := map[string]interface{}{}

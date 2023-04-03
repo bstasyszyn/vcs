@@ -16,9 +16,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/trustbloc/logutil-go/pkg/log"
+
 	"github.com/trustbloc/vcs/internal/logfields"
 	"github.com/trustbloc/vcs/pkg/doc/vc"
 
@@ -150,7 +150,7 @@ func (s *Manager) getProfileCSLAndAssignedIndex(ctx context.Context,
 func (s *Manager) getCSLIndexWrapper(ctx context.Context,
 	profile *profileapi.Issuer) (*credentialstatus.CSLIndexWrapper, error) {
 	// get latest ListID - global value
-	latestListID, err := s.cslIndexStore.GetLatestListID(ctx)
+	latestListID, err := s.cslIndexStore.GetLatestListID(ctx, profile.GroupID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get latestListID from store: %w", err)
 	}
@@ -201,9 +201,8 @@ func (s *Manager) updateCSLIndexWrapper(ctx context.Context,
 
 func (s *Manager) createCSLIndexWrapper(ctx context.Context,
 	profile *profileapi.Issuer) (*credentialstatus.CSLIndexWrapper, error) {
-	newListID := credentialstatus.ListID(uuid.NewString())
-
-	if err := s.cslIndexStore.UpdateLatestListID(ctx, newListID); err != nil {
+	newListID, err := s.cslIndexStore.UpdateLatestListID(ctx, profile.GroupID)
+	if err != nil {
 		return nil, fmt.Errorf("failed to store new list ID: %w", err)
 	}
 
@@ -250,7 +249,7 @@ func (s *Manager) createNewVCAndCSLIndexWrapper(ctx context.Context,
 	}
 
 	indexWrapper := &credentialstatus.CSLIndexWrapper{
-		UsedIndexes: nil,
+		ProfileGroupID: profile.GroupID,
 	}
 
 	if err = s.cslIndexStore.Upsert(ctx, cslURL, indexWrapper); err != nil {

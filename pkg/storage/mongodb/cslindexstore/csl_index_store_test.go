@@ -184,21 +184,21 @@ func TestLatestListID(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Find non-existing ID", func(t *testing.T) {
-		listID, err := store.GetLatestListID(ctx)
+		listID, err := store.GetLatestListID(ctx, "")
 
 		assert.NotEmpty(t, listID)
 		assert.NoError(t, err)
 	})
 
 	t.Run("Update - Get LatestListID", func(t *testing.T) {
-		receivedListID, err := store.GetLatestListID(ctx)
+		receivedListID, err := store.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEmpty(t, receivedListID)
 
-		err = store.UpdateLatestListID(ctx, "1")
+		_, err = store.UpdateLatestListID(ctx, "1")
 		require.NoError(t, err)
 
-		receivedListIDAfterUpdate, err := store.GetLatestListID(ctx)
+		receivedListIDAfterUpdate, err := store.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEmpty(t, receivedListIDAfterUpdate)
 		require.NotEqual(t, receivedListID, receivedListIDAfterUpdate)

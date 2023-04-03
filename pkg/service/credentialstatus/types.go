@@ -31,16 +31,10 @@ type CSL verifiable.Credential
 type CSLIndexWrapper struct {
 	CSLURL string `json:"cslURL"`
 
-	ListID ListID `json:"listID"`
-
 	// UsedIndexes stores the list of used bit indexes in the CSL encoded list.
 	UsedIndexes []int `json:"usedIndexes"`
 
 	ProfileGroupID string `json:"profileGroupID"`
-
-	Status string `json:"status"`
-
-	OwnerID string `json:"ownerID"`
 }
 
 // CSLVCWrapper contains CSL VC and version.

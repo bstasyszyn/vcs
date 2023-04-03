@@ -66,7 +66,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		cslIndexStore := newMockCSLIndexStore()
 		cslVCStore := newMockCSLVCStore()
 
-		listID, err := cslIndexStore.GetLatestListID(context.Background())
+		listID, err := cslIndexStore.GetLatestListID(context.Background(), "")
 		require.NoError(t, err)
 
 		s, err := New(&Config{
@@ -90,7 +90,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		validateVCStatus(t, cslVCStore, statusID, listID)
 
 		// List size equals 2, so after 2 issuances CSL encodedBitString is full and listID must be updated.
-		updatedListID, err := cslIndexStore.GetLatestListID(ctx)
+		updatedListID, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
@@ -103,7 +103,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		validateVCStatus(t, cslVCStore, statusID, updatedListID)
 
 		// List size equals 2, so after 4 issuances CSL encodedBitString is full and listID must be updated.
-		updatedListIDSecond, err := cslIndexStore.GetLatestListID(ctx)
+		updatedListIDSecond, err := cslIndexStore.GetLatestListID(ctx, "")
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
@@ -148,7 +148,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		cslIndexStore := newMockCSLIndexStore()
 		cslVCStore := newMockCSLVCStore()
 
-		_, err := cslIndexStore.GetLatestListID(context.Background())
+		_, err := cslIndexStore.GetLatestListID(context.Background(), "")
 		require.NoError(t, err)
 
 		s, err := New(&Config{
@@ -245,7 +245,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 
 		cslIndexStore := newMockCSLIndexStore()
 
-		_, err := cslIndexStore.GetLatestListID(context.Background())
+		_, err := cslIndexStore.GetLatestListID(context.Background(), "")
 		require.NoError(t, err)
 
 		s, err := New(&Config{
@@ -303,7 +303,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		statusProcessor, err := statustype.GetVCStatusProcessor(vc.StatusList2021VCStatus)
 		require.NoError(t, err)
 
-		listID, err := cslIndexStore.GetLatestListID(context.Background())
+		listID, err := cslIndexStore.GetLatestListID(context.Background(), "")
 		require.NoError(t, err)
 
 		cslURL, err := cslVCStore.GetCSLURL("https://localhost:8080", profile.GroupID, listID)
@@ -488,14 +488,14 @@ func (m *mockCSLIndexStore) createLatestListID() error {
 	return nil
 }
 
-func (m *mockCSLIndexStore) UpdateLatestListID(ctx context.Context, id credentialstatus.ListID) error {
+func (m *mockCSLIndexStore) UpdateLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	if m.updateLatestListIDErr != nil {
-		return m.updateLatestListIDErr
+		return "", m.updateLatestListIDErr
 	}
-	return m.createLatestListID()
+	return "", m.createLatestListID()
 }
 
-func (m *mockCSLIndexStore) GetLatestListID(ctx context.Context) (credentialstatus.ListID, error) {
+func (m *mockCSLIndexStore) GetLatestListID(ctx context.Context, profileGroupID string) (credentialstatus.ListID, error) {
 	if m.getLatestListIDErr != nil {
 		return "", m.getLatestListIDErr
 	}
