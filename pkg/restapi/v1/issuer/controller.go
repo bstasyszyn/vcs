@@ -23,7 +23,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/piprate/json-gold/ld"
 	"github.com/samber/lo"
-	"github.com/xeipuuv/gojsonschema"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/hyperledger/aries-framework-go/component/models/ld/validator"
@@ -34,6 +33,7 @@ import (
 	"github.com/trustbloc/vcs/pkg/doc/vc/crypto"
 	vcsverifiable "github.com/trustbloc/vcs/pkg/doc/verifiable"
 	"github.com/trustbloc/vcs/pkg/event/spi"
+	"github.com/trustbloc/vcs/pkg/internal/common/jsonschema"
 	"github.com/trustbloc/vcs/pkg/kms"
 	"github.com/trustbloc/vcs/pkg/observability/tracing/attributeutil"
 	profileapi "github.com/trustbloc/vcs/pkg/profile"
@@ -90,6 +90,11 @@ type Config struct {
 	Tracer                 trace.Tracer
 }
 
+// JSONSchemaValidator validates the given data agains the given JSON schema.
+type JSONSchemaValidator interface {
+	Validate(data interface{}, schemaDoc map[string]interface{}) error
+}
+
 // Controller for Issuer Profile Management API.
 type Controller struct {
 	profileSvc             profileService
@@ -100,6 +105,7 @@ type Controller struct {
 	vcStatusManager        vcStatusManager
 	externalHostURL        string
 	tracer                 trace.Tracer
+	schemaValidator        JSONSchemaValidator
 }
 
 // NewController creates a new controller for Issuer Profile Management API.
@@ -113,6 +119,7 @@ func NewController(config *Config) *Controller {
 		vcStatusManager:        config.VcStatusManager,
 		externalHostURL:        config.ExternalHostURL,
 		tracer:                 config.Tracer,
+		schemaValidator:        jsonschema.NewCachingValidator(),
 	}
 }
 
@@ -692,8 +699,8 @@ func (c *Controller) validateClaims( //nolint:gocognit
 	}
 
 	validate := func(sub verifiable.Subject) error {
-		if credentialTemplate != nil && credentialTemplate.JSONSchema != "" {
-			if err := validateJSONSchema(sub.CustomFields, credentialTemplate.JSONSchema); err != nil {
+		if credentialTemplate != nil && credentialTemplate.JSONSchemaDoc != nil {
+			if err := c.schemaValidator.Validate(sub.CustomFields, credentialTemplate.JSONSchemaDoc); err != nil {
 				return fmt.Errorf("validate claims: %w", err)
 			}
 		}
@@ -756,37 +763,6 @@ func getCredentialSubjects(subject interface{}) ([]verifiable.Subject, error) {
 	}
 
 	return nil, fmt.Errorf("invalid type for credential subject: %T", subject)
-}
-
-type JSONSchemaValidationErrors []gojsonschema.ResultError
-
-func (e JSONSchemaValidationErrors) Error() string {
-	var errMsg string
-
-	for i, msg := range e {
-		errMsg += msg.String()
-		if i+1 < len(e) {
-			errMsg += "; "
-		}
-	}
-
-	return fmt.Sprintf("[%s]", errMsg)
-}
-
-func validateJSONSchema(data interface{}, schema string) error {
-	result, err := gojsonschema.Validate(
-		gojsonschema.NewStringLoader(schema),
-		gojsonschema.NewGoLoader(data),
-	)
-	if err != nil {
-		return fmt.Errorf("schema error: %w", err)
-	}
-
-	if !result.Valid() {
-		return fmt.Errorf("validation error: %w", JSONSchemaValidationErrors(result.Errors()))
-	}
-
-	return nil
 }
 
 // OpenidConfig request openid configuration for issuer.
