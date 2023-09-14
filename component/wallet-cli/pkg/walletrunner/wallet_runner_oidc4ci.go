@@ -662,6 +662,9 @@ func (s *Service) getCredential(
 
 	vcsStart := time.Now()
 	finalDuration := time.Duration(0)
+
+	fmt.Printf("***** Posting to credential endpoint [%s]\n", credentialEndpoint)
+
 	resp, err := httpClient.Post(credentialEndpoint, "application/json", bytes.NewBuffer(b))
 	finalDuration = time.Since(vcsStart)
 	if err != nil {

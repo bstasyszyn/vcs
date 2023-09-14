@@ -11,6 +11,7 @@ package issuer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -28,6 +29,7 @@ import (
 	"github.com/trustbloc/logutil-go/pkg/log"
 	"github.com/trustbloc/vc-go/verifiable"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 
 	"github.com/trustbloc/vcs/internal/logfields"
 	"github.com/trustbloc/vcs/pkg/doc/vc"
@@ -614,6 +616,8 @@ func (c *Controller) ValidatePreAuthorizedCodeRequest(ctx echo.Context) error {
 // PrepareCredential requests claim data and prepares VC for signing by issuer.
 // POST /issuer/interactions/prepare-credential.
 func (c *Controller) PrepareCredential(e echo.Context) error {
+	logger.Debug("******* PrepareCredential called")
+
 	var body PrepareCredential
 
 	if err := util.ReadBody(e, &body); err != nil {
@@ -683,17 +687,24 @@ func (c *Controller) validateClaims( //nolint:gocognit
 ) error {
 	subjects, err := getCredentialSubjects(cred.Subject)
 	if err != nil {
+		logger.Error("Can't get credential subjects", log.WithError(err))
 		return err
 	}
 
+	logger.Debug("******* Validating credential subjects", zap.Int("numVCSubjects", len(subjects)))
+
 	for _, sub := range subjects {
+		logger.Debug("Validating credential subject", zap.Any("vcSubject", sub))
+
 		if validateJSONLD {
+			logger.Debug("Validating credential subject against JSON-LD", zap.Any("vcSubject", sub))
 			if err := c.validateJSONLD(cred, sub); err != nil {
 				return err
 			}
 		}
 
 		if credentialTemplate != nil && credentialTemplate.JSONSchemaID != "" {
+			logger.Debug("Validating credential subject against JSON schema", zap.Any("vcSubject", sub))
 			if err := c.validateJSONSchema(cred, credentialTemplate, sub); err != nil {
 				return err
 			}
@@ -759,6 +770,9 @@ func (c *Controller) validateJSONSchema(
 		logfields.WithCredentialTemplateID(credentialTemplate.ID),
 		logfields.WithJSONSchemaID(credentialTemplate.JSONSchemaID),
 	)
+
+	fieldBytes, _ := json.Marshal(sub.CustomFields)
+	fmt.Printf("***** Custom fields: %s\n", string(fieldBytes))
 
 	return c.schemaValidator.Validate(sub.CustomFields, credentialTemplate.JSONSchemaID,
 		[]byte(credentialTemplate.JSONSchema))

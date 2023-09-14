@@ -19,6 +19,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/trustbloc/logutil-go/pkg/log"
 	"github.com/trustbloc/vc-go/jwt"
+	"go.uber.org/zap"
 
 	"github.com/trustbloc/vcs/internal/logfields"
 	"github.com/trustbloc/vcs/pkg/doc/vc"
@@ -33,6 +34,8 @@ func (s *Service) InitiateIssuance( // nolint:funlen,gocyclo,gocognit
 	req *InitiateIssuanceRequest,
 	profile *profileapi.Issuer,
 ) (*InitiateIssuanceResponse, error) {
+	logger.Debug("***** Initiate issuance", logfields.WithProfileID(profile.ID))
+
 	if req.OpState == "" {
 		req.OpState = uuid.NewString()
 	}
@@ -97,8 +100,9 @@ func (s *Service) InitiateIssuance( // nolint:funlen,gocyclo,gocognit
 	if isPreAuthorizeFlow {
 		if logger.IsEnabled(log.DEBUG) {
 			claimKeys := make([]string, 0)
-			for k := range req.ClaimData {
+			for k, v := range req.ClaimData {
 				claimKeys = append(claimKeys, k)
+				logger.Debugc(ctx, "issuer claim", zap.String("claimKey", k), zap.Any("claimValue", v))
 			}
 
 			logger.Debugc(ctx, "issuer claim keys", logfields.WithClaimKeys(claimKeys))

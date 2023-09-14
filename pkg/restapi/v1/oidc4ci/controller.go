@@ -19,6 +19,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -603,6 +604,9 @@ func (c *Controller) OidcCredential(e echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("***** Calling PrepareCredential - TxID [%s]\n", session.Extra[txIDKey])
+	debug.PrintStack()
 
 	resp, err := c.issuerInteractionClient.PrepareCredential(ctx,
 		issuer.PrepareCredentialJSONRequestBody{
