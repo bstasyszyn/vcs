@@ -11,6 +11,7 @@ package issuer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -759,6 +760,10 @@ func (c *Controller) validateJSONSchema(
 		logfields.WithCredentialTemplateID(credentialTemplate.ID),
 		logfields.WithJSONSchemaID(credentialTemplate.JSONSchemaID),
 	)
+
+	fieldsBytes, _ := json.Marshal(sub.CustomFields)
+
+	fmt.Printf("***** Custom fields to validate: %s\n", fieldsBytes)
 
 	return c.schemaValidator.Validate(sub.CustomFields, credentialTemplate.JSONSchemaID,
 		[]byte(credentialTemplate.JSONSchema))
