@@ -1161,8 +1161,11 @@ func TestValidatePreAuthCode(t *testing.T) {
 				TokenEndpointAuthMethodsSupported: []string{"attest_jwt_client_auth"},
 			},
 			Checks: profileapi.IssuanceChecks{
-				ClientAttestationCheck: profileapi.ClientAttestationCheck{
+				Policy: profileapi.PolicyCheck{
 					PolicyURL: "https://localhost/policy",
+				},
+				ClientAttestationCheck: profileapi.ClientAttestationCheck{
+					Enabled: true,
 				},
 			},
 		}, nil)

@@ -44,8 +44,11 @@ func TestService_AuthenticateClient(t *testing.T) {
 					},
 					SigningDID: &profileapi.SigningDID{DID: issuerDID},
 					Checks: profileapi.IssuanceChecks{
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://policy.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				}
@@ -113,8 +116,11 @@ func TestService_AuthenticateClient(t *testing.T) {
 					},
 
 					Checks: profileapi.IssuanceChecks{
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://policy.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				}
@@ -136,8 +142,11 @@ func TestService_AuthenticateClient(t *testing.T) {
 						TokenEndpointAuthMethodsSupported: []string{"attest_jwt_client_auth"},
 					},
 					Checks: profileapi.IssuanceChecks{
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://policy.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				}
@@ -159,8 +168,11 @@ func TestService_AuthenticateClient(t *testing.T) {
 						TokenEndpointAuthMethodsSupported: []string{"attest_jwt_client_auth"},
 					},
 					Checks: profileapi.IssuanceChecks{
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://policy.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				}
@@ -183,8 +195,11 @@ func TestService_AuthenticateClient(t *testing.T) {
 						TokenEndpointAuthMethodsSupported: []string{"attest_jwt_client_auth"},
 					},
 					Checks: profileapi.IssuanceChecks{
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://policy.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				}

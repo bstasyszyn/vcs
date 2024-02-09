@@ -161,8 +161,11 @@ func TestService_VerifyPresentation(t *testing.T) {
 								"https://example.edu/issuers/14": {},
 							},
 						},
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://trustregistry.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				},
@@ -394,8 +397,11 @@ func TestService_VerifyPresentation(t *testing.T) {
 								"random": {},
 							},
 						},
-						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+						Policy: profileapi.PolicyCheck{
 							PolicyURL: "https://trustregistry.example.com",
+						},
+						ClientAttestationCheck: profileapi.ClientAttestationCheck{
+							Enabled: true,
 						},
 					},
 				},

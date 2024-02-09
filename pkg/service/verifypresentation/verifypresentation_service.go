@@ -89,25 +89,21 @@ func (s *Service) VerifyPresentation( //nolint:funlen,gocognit
 	var targetPresentation interface{}
 	targetPresentation = presentation
 
-	attestationEnabled := profile.Checks.ClientAttestationCheck.PolicyURL != ""
+	st := time.Now()
 
-	if attestationEnabled {
-		st := time.Now()
-
-		err := s.clientAttestationService.ValidatePresentation(
-			ctx,
-			profile,
-			presentation.JWT,
-		)
-		if err != nil {
-			result = append(result, PresentationVerificationCheckResult{
-				Check: "clientAttestation",
-				Error: err.Error(),
-			})
-		}
-
-		logger.Debugc(ctx, "Checks.Policy", log.WithDuration(time.Since(st)))
+	err := s.clientAttestationService.ValidatePresentation(
+		ctx,
+		profile,
+		presentation.JWT,
+	)
+	if err != nil {
+		result = append(result, PresentationVerificationCheckResult{
+			Check: "clientAttestation",
+			Error: err.Error(),
+		})
 	}
+
+	logger.Debugc(ctx, "Checks.Policy", log.WithDuration(time.Since(st)))
 
 	if profile.Checks.Presentation.Proof {
 		st := time.Now()
@@ -136,6 +132,8 @@ func (s *Service) VerifyPresentation( //nolint:funlen,gocognit
 			})
 		}
 	}
+
+	attestationEnabled := profile.Checks.ClientAttestationCheck.Enabled
 
 	if profile.Checks.Credential.CredentialExpiry {
 		err := s.checkCredentialExpiry(ctx, credentials, attestationEnabled)
@@ -212,7 +210,7 @@ func (s *Service) checkCredentialStrict(
 	claimKeysDict := map[string][]string{}
 
 	for _, cred := range credentials {
-		//TODO: check how bug fixed will affects other code.
+		// TODO: check how bug fixed will affects other code.
 		// previously if credential was not in format of *verifiable.Credential validations was ignored
 		// This happened for all json-ld credentials in verifiable.Presentation
 

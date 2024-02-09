@@ -47,6 +47,7 @@ type Config struct {
 	VCStatusVerifier vcStatusVerifier
 }
 
+// FIXME: Rename package to pilicy or trustregistry since attestations are only a part of policy evaluation.
 // Service implements attestation functionality for OAuth 2.0 Attestation-Based Client Authentication.
 type Service struct {
 	httpClient       httpClient
@@ -74,16 +75,16 @@ func (s *Service) ValidateIssuance(
 	logger.Debugc(ctx, "validate issuance",
 		zap.String("profileID", profile.ID),
 		zap.String("profileVersion", profile.Version),
-		zap.String("policyURL", profile.Checks.ClientAttestationCheck.PolicyURL),
+		zap.String("policyURL", profile.Checks.Policy.PolicyURL),
+		zap.Bool("attestationCheckEnabled", profile.Checks.ClientAttestationCheck.Enabled),
 		zap.String("jwtVP", jwtVP),
 	)
 
-	_, attestationVCs, err := s.validateAttestationVP(ctx, jwtVP)
-	if err != nil {
-		return err
-	}
+	if profile.Checks.Policy.PolicyURL == "" {
+		if profile.Checks.ClientAttestationCheck.Enabled {
+			return errors.New("client attestation checks are enabled but policy URL is not configured")
+		}
 
-	if profile.Checks.ClientAttestationCheck.PolicyURL == "" {
 		return nil
 	}
 
@@ -91,13 +92,20 @@ func (s *Service) ValidateIssuance(
 		IssuerDID: profile.SigningDID.DID,
 	}
 
-	for _, vc := range attestationVCs {
-		jwtVC, convertErr := vc.ToJWTString()
-		if convertErr != nil {
-			return fmt.Errorf("convert attestation vc to jwt: %w", convertErr)
+	if profile.Checks.ClientAttestationCheck.Enabled {
+		_, attestationVCs, err := s.validateAttestationVP(ctx, jwtVP)
+		if err != nil {
+			return err
 		}
 
-		req.AttestationVC = lo.ToPtr(jwtVC)
+		for _, vc := range attestationVCs {
+			jwtVC, convertErr := vc.ToJWTString()
+			if convertErr != nil {
+				return fmt.Errorf("convert attestation vc to jwt: %w", convertErr)
+			}
+
+			req.AttestationVC = lo.ToPtr(jwtVC)
+		}
 	}
 
 	payload, err := json.Marshal(req)
@@ -105,7 +113,7 @@ func (s *Service) ValidateIssuance(
 		return fmt.Errorf("marshal request: %w", err)
 	}
 
-	resp, err := s.requestPolicyEvaluation(ctx, profile.Checks.ClientAttestationCheck.PolicyURL, payload)
+	resp, err := s.requestPolicyEvaluation(ctx, profile.Checks.Policy.PolicyURL, payload)
 	if err != nil {
 		return fmt.Errorf("policy evaluation: %w", err)
 	}
@@ -126,16 +134,16 @@ func (s *Service) ValidatePresentation(
 	logger.Debugc(ctx, "validate presentation",
 		zap.String("profileID", profile.ID),
 		zap.String("profileVersion", profile.Version),
-		zap.String("policyURL", profile.Checks.ClientAttestationCheck.PolicyURL),
+		zap.String("policyURL", profile.Checks.Policy.PolicyURL),
+		zap.Bool("attestationCheckEnabled", profile.Checks.ClientAttestationCheck.Enabled),
 		zap.String("jwtVP", jwtVP),
 	)
 
-	vp, attestationVCs, err := s.validateAttestationVP(ctx, jwtVP)
-	if err != nil {
-		return err
-	}
+	if profile.Checks.Policy.PolicyURL == "" {
+		if profile.Checks.ClientAttestationCheck.Enabled {
+			return errors.New("client attestation checks are enabled but policy URL is not configured")
+		}
 
-	if profile.Checks.ClientAttestationCheck.PolicyURL == "" {
 		return nil
 	}
 
@@ -143,20 +151,38 @@ func (s *Service) ValidatePresentation(
 		VerifierDID: profile.SigningDID.DID,
 	}
 
-	jwtVCs := make([]string, len(attestationVCs))
-
-	for i, vc := range attestationVCs {
-		jwtVC, marshalErr := vc.ToJWTString()
-		if marshalErr != nil {
-			return fmt.Errorf("marshal attestation vc to jwt: %w", marshalErr)
+	if profile.Checks.ClientAttestationCheck.Enabled {
+		_, attestationVCs, err := s.validateAttestationVP(ctx, jwtVP)
+		if err != nil {
+			return err
 		}
 
-		jwtVCs[i] = jwtVC
+		jwtVCs := make([]string, len(attestationVCs))
+
+		for i, vc := range attestationVCs {
+			jwtVC, marshalErr := vc.ToJWTString()
+			if marshalErr != nil {
+				return fmt.Errorf("marshal attestation vc to jwt: %w", marshalErr)
+			}
+
+			jwtVCs[i] = jwtVC
+		}
+
+		req.AttestationVC = lo.ToPtr(jwtVCs)
 	}
 
-	req.AttestationVC = lo.ToPtr(jwtVCs)
-
 	credentialMetadata := make([]CredentialMetadata, 0)
+
+	vp, err := verifiable.ParsePresentation(
+		[]byte(jwtVP),
+		// The verification of proof is conducted manually, along with an extra verification to ensure that signer of
+		// the VP matches the subject of the attestation VC.
+		verifiable.WithPresDisabledProofCheck(),
+		verifiable.WithPresJSONLDDocumentLoader(s.documentLoader),
+	)
+	if err != nil {
+		return fmt.Errorf("parse attestation vp: %w", err)
+	}
 
 	for _, vc := range vp.Credentials() {
 		if lo.Contains(vc.Contents().Types, WalletAttestationVCType) {
@@ -193,7 +219,7 @@ func (s *Service) ValidatePresentation(
 		return fmt.Errorf("marshal request: %w", err)
 	}
 
-	resp, err := s.requestPolicyEvaluation(ctx, profile.Checks.ClientAttestationCheck.PolicyURL, payload)
+	resp, err := s.requestPolicyEvaluation(ctx, profile.Checks.Policy.PolicyURL, payload)
 	if err != nil {
 		return fmt.Errorf("policy evaluation: %w", err)
 	}
@@ -255,9 +281,9 @@ func (s *Service) validateAttestationVP(
 
 		// check attestation VC status
 		// TODO: status list check should be mandatory for attestation VC
-		//if err = s.vcStatusVerifier.ValidateVCStatus(ctx, vcc.Status, vcc.Issuer); err != nil {
+		// if err = s.vcStatusVerifier.ValidateVCStatus(ctx, vcc.Status, vcc.Issuer); err != nil {
 		//	return nil, nil, fmt.Errorf("validate attestation vc status: %w", err)
-		//}
+		// }
 
 		attestationVCs = append(attestationVCs, vc)
 	}

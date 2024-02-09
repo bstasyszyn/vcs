@@ -165,8 +165,11 @@ func TestExchangeCodeAuthenticateClientError(t *testing.T) {
 			TokenEndpointAuthMethodsSupported: []string{"attest_jwt_client_auth"},
 		},
 		Checks: profile.IssuanceChecks{
-			ClientAttestationCheck: profile.ClientAttestationCheck{
+			Policy: profile.PolicyCheck{
 				PolicyURL: "https://localhost/policy",
+			},
+			ClientAttestationCheck: profile.ClientAttestationCheck{
+				Enabled: true,
 			},
 		},
 	}, nil)
