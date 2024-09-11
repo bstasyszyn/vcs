@@ -1261,7 +1261,7 @@ func newVP(t *testing.T, submission *presexch.PresentationSubmission,
 
 func newVC(issuer string, ctx []string, customTypes []string) verifiable.CredentialContents {
 	cred := verifiable.CredentialContents{
-		Context: []string{verifiable.ContextURI},
+		Context: []string{verifiable.V1ContextURI},
 		Types:   append([]string{verifiable.VCType}, customTypes...),
 		ID:      "http://test.credential.com/123",
 		Issuer:  &verifiable.Issuer{ID: issuer},
@@ -1285,7 +1285,7 @@ func newVC(issuer string, ctx []string, customTypes []string) verifiable.Credent
 
 func newDegreeVC(issuer string, degreeType string, ctx []string, customTypes []string) verifiable.CredentialContents {
 	cred := verifiable.CredentialContents{
-		Context: []string{verifiable.ContextURI},
+		Context: []string{verifiable.V1ContextURI},
 		Types:   append([]string{verifiable.VCType}, customTypes...),
 		ID:      uuid.New().String(),
 		Issuer:  &verifiable.Issuer{ID: issuer},

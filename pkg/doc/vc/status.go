@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package vc
 
 import (
+	"github.com/samber/lo"
 	"github.com/trustbloc/vc-go/verifiable"
 )
 
@@ -29,6 +30,11 @@ const (
 	//  VC > Status > Type
 	// 	Doc: https://w3c-ccg.github.io/vc-status-rl-2020/
 	RevocationList2020VCStatus StatusType = "RevocationList2020Status"
+
+	// BitstringStatusList represents the implementation of the Bitstring VC Status List.
+	//  VC > Status > Type
+	// 	Doc: https://www.w3.org/TR/vc-bitstring-status-list/
+	BitstringStatusList StatusType = "BitstringStatusListEntry"
 )
 
 // StatusProcessor holds the list of methods required for processing different versions of Status(Revocation) List VC.
@@ -37,7 +43,8 @@ type StatusProcessor interface {
 	GetStatusVCURI(vcStatus *verifiable.TypedID) (string, error)
 	GetStatusListIndex(vcStatus *verifiable.TypedID) (int, error)
 	CreateVC(vcID string, listSize int, profile *Signer) (*verifiable.Credential, error)
-	CreateVCStatus(statusListIndex string, vcID string) *verifiable.TypedID
+	CreateVCStatus(index string, vcID string, purpose string,
+		additionalFields ...lo.Tuple2[string, any]) *verifiable.TypedID
 	GetVCContext() string
 }
 

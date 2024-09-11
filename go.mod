@@ -41,7 +41,7 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/tidwall/sjson v1.2.5
 	github.com/trustbloc/bbs-signature-go v1.0.2
-	github.com/trustbloc/did-go v1.2.2-0.20240812150654-c7d31e666f96
+	github.com/trustbloc/did-go v1.3.1-0.20240910130808-bf0188fdfe70
 	github.com/trustbloc/kms-go v1.1.2
 	github.com/trustbloc/logutil-go v1.0.0-rc1
 	github.com/trustbloc/vc-go v1.1.3-0.20240813130343-c7c2ade0e1fc
@@ -196,3 +196,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
+
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20240911200306-11ed82890c34

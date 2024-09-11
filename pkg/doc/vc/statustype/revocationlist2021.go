@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	utiltime "github.com/trustbloc/did-go/doc/util/time"
 	"github.com/trustbloc/vc-go/verifiable"
 
@@ -90,12 +91,13 @@ func (s *revocationList2021Processor) ValidateStatus(vcStatus *verifiable.TypedI
 
 // CreateVCStatus creates verifiable.TypedID.
 // Doc: https://github.com/w3c-ccg/vc-status-list-2021/releases/tag/v0.0.1
-func (s *revocationList2021Processor) CreateVCStatus(statusListIndex, vcID string) *verifiable.TypedID {
+func (s *revocationList2021Processor) CreateVCStatus(index string, vcID string, _ string,
+	_ ...lo.Tuple2[string, any]) *verifiable.TypedID {
 	return &verifiable.TypedID{
 		ID:   uuid.New().URN(),
 		Type: string(vcapi.RevocationList2021VCStatus),
 		CustomFields: verifiable.CustomFields{
-			StatusListIndex:      statusListIndex,
+			StatusListIndex:      index,
 			StatusListCredential: vcID,
 		},
 	}

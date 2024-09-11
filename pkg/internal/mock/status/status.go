@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package status
 
 import (
+	"github.com/samber/lo"
 	"github.com/trustbloc/vc-go/verifiable"
 
 	"github.com/trustbloc/vcs/pkg/doc/vc"
@@ -49,7 +50,7 @@ func (m *MockVCStatusProcessor) CreateVC(_ string, _ int, _ *vc.Signer) (*verifi
 	return m.VC, m.CreateVCErr
 }
 
-func (m *MockVCStatusProcessor) CreateVCStatus(_ string, _ string) *verifiable.TypedID {
+func (m *MockVCStatusProcessor) CreateVCStatus(string, string, string, ...lo.Tuple2[string, any]) *verifiable.TypedID {
 	return m.VCStatus
 }
 

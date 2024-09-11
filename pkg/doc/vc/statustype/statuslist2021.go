@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 	utiltime "github.com/trustbloc/did-go/doc/util/time"
 	"github.com/trustbloc/vc-go/verifiable"
 
@@ -27,20 +28,10 @@ const (
 	// StatusList2021VCSubjectType is the subject type of status list VC.
 	// 	status list VC > Subject > Type
 	StatusList2021VCSubjectType = "StatusList2021"
-	// StatusListIndex identifies the bit position of the status value of the VC.
-	//  VC > Status > CustomFields key.
-	StatusListIndex = "statusListIndex"
-	// StatusListCredential stores the link to the status list VC.
-	//  VC > Status > CustomFields key.
-	StatusListCredential = "statusListCredential"
-	// StatusPurpose for StatusList2021.
-	//  VC > Status > CustomFields key. Only "revocation" value is supported.
-	StatusPurpose = "statusPurpose"
 	// StatusList2021Context for StatusList2021.
 	StatusList2021Context = "https://w3id.org/vc/status-list/2021/v1"
 	// bitStringSize represents the size of compressed bitstring.
 	bitStringSize = 128000
-	vcType        = "VerifiableCredential"
 )
 
 // statusList2021Processor implements f Status List 2021.
@@ -83,28 +74,29 @@ func (s *statusList2021Processor) ValidateStatus(vcStatus *verifiable.TypedID) e
 	}
 
 	if vcStatus.CustomFields[StatusListIndex] == nil {
-		return fmt.Errorf("statusListIndex field not exist in vc status")
+		return fmt.Errorf("%s field not exist in vc status", StatusListIndex)
 	}
 
 	if vcStatus.CustomFields[StatusListCredential] == nil {
-		return fmt.Errorf("statusListCredential field not exist in vc status")
+		return fmt.Errorf("%s field not exist in vc status", StatusListCredential)
 	}
 
 	if vcStatus.CustomFields[StatusPurpose] == nil {
-		return fmt.Errorf("statusPurpose field not exist in vc status")
+		return fmt.Errorf("%s field not exist in vc status", StatusPurpose)
 	}
 
 	return nil
 }
 
 // CreateVCStatus creates verifiable.TypedID.
-func (s *statusList2021Processor) CreateVCStatus(statusListIndex, vcID string) *verifiable.TypedID {
+func (s *statusList2021Processor) CreateVCStatus(index string, vcID string, purpose string,
+	_ ...lo.Tuple2[string, any]) *verifiable.TypedID {
 	return &verifiable.TypedID{
 		ID:   uuid.New().URN(),
 		Type: string(vcapi.StatusList2021VCStatus),
 		CustomFields: verifiable.CustomFields{
-			StatusPurpose:        "revocation",
-			StatusListIndex:      statusListIndex,
+			StatusPurpose:        purpose,
+			StatusListIndex:      index,
 			StatusListCredential: vcID,
 		},
 	}
@@ -142,7 +134,7 @@ func (s *statusList2021Processor) CreateVC(vcID string, listSize int,
 	vcc.Subject = toVerifiableSubject(credentialSubject{
 		ID:            vcc.ID + "#list",
 		Type:          StatusList2021VCSubjectType,
-		StatusPurpose: "revocation",
+		StatusPurpose: StatusPurposeRevocation,
 		EncodedList:   encodeBits,
 	})
 
