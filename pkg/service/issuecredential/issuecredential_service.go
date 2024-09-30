@@ -10,6 +10,7 @@ package issuecredential
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/samber/lo"
@@ -163,6 +164,11 @@ func (s *Service) IssueCredential(
 	if err != nil {
 		return nil, fmt.Errorf("sign credential: %w", err)
 	}
+
+	vcBytes, _ := json.Marshal(signedVC)
+	fmt.Println("----------------- Signed VC -----------------")
+	fmt.Println(string(vcBytes))
+	fmt.Println("--------------------------------------------------")
 
 	credentialMetadata := &credentialstatus.CredentialMetadata{
 		CredentialID:   credential.Contents().ID,
