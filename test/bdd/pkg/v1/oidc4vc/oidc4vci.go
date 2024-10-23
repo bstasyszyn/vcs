@@ -1184,9 +1184,9 @@ func (s *Steps) setExpectedCredentialsAmountForVP(expectedCredentialsAmount stri
 }
 
 func checkEventInteractionDetailsClaim(event *spi.Event) error {
-	eventData, ok := event.Data.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("event payload has unexpected type: %v", event.Data)
+	eventData, err := getEventPayloadJSON(event)
+	if err != nil {
+		return err
 	}
 
 	interactionDetails, ok := eventData["interaction_details"].(map[string]interface{})
@@ -1523,4 +1523,27 @@ func (p *oidc4vciProvider) Wallet() *wallet.Wallet {
 
 func (p *oidc4vciProvider) WellKnownService() *wellknown.Service {
 	return p.wellKnownService
+}
+
+func getEventPayloadJSON(event *spi.Event) (map[string]interface{}, error) {
+	eventData, ok := event.Data.(map[string]interface{})
+	if ok {
+		return eventData, nil
+	}
+
+	payloadStr, ok := event.Data.(string)
+	if !ok {
+		return nil, fmt.Errorf("event payload has unexpected type: %v", event.Data)
+	}
+
+	payloadBytes, err := base64.StdEncoding.DecodeString(payloadStr)
+	if err != nil {
+		return nil, fmt.Errorf("decode event payload: %w", err)
+	}
+
+	if err := json.Unmarshal(payloadBytes, &eventData); err != nil {
+		return nil, fmt.Errorf("unmarshal event payload: %w", err)
+	}
+
+	return eventData, nil
 }

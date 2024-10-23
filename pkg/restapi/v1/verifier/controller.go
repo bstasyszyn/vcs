@@ -729,6 +729,10 @@ func validateIDToken(
 }
 
 func (c *Controller) validateRawVPToken(vpToken string) (*VPTokenClaims, error) {
+	fmt.Println("----------------- Validating VP Token -----------------")
+	fmt.Println(vpToken)
+	fmt.Println("-------------------------------------------------------")
+
 	if jwt.IsJWS(vpToken) {
 		return c.validateVPTokenJWT(vpToken)
 	}

@@ -230,6 +230,11 @@ func (f *Flow) Run(ctx context.Context) error {
 	var credentials []*verifiable.Credential
 
 	for _, vp := range vps {
+		vpBytes, _ := json.Marshal(vp)
+		fmt.Println("----------------- Verifiable Presentation -----------------")
+		fmt.Println(string(vpBytes))
+		fmt.Println("----------------------------------------------------------")
+
 		vpCredentials := vp.Credentials()
 
 		if !f.disableDomainMatching {
