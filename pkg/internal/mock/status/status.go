@@ -47,7 +47,7 @@ func (m *MockVCStatusProcessor) GetStatusListIndex(_ *verifiable.TypedID) (int, 
 	return m.StatusListIndex, m.GetStatusListIndexErr
 }
 
-func (m *MockVCStatusProcessor) CreateVC(_ string, _ int, _ *vc.Signer) (*verifiable.Credential, error) {
+func (m *MockVCStatusProcessor) CreateVC(vcID string, listSize int, purpose string, profile *vc.Signer) (*verifiable.Credential, error) {
 	return m.VC, m.CreateVCErr
 }
 
@@ -65,4 +65,8 @@ func (m *MockVCStatusProcessor) UpdateStatus(*verifiable.Credential, bool, ...in
 
 func (m *MockVCStatusProcessor) IsSet(*verifiable.Credential, int) (bool, error) {
 	return m.Set, m.IsSetErr
+}
+
+func (m *MockVCStatusProcessor) GetStatusPurpose(vcStatus *verifiable.TypedID) (string, error) {
+	return "", nil
 }

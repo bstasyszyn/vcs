@@ -12,6 +12,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/trustbloc/vcs/pkg/doc/vc/statustype"
 	"net/http"
 
 	"github.com/piprate/json-gold/ld"
@@ -33,8 +34,11 @@ import (
 
 var logger = log.New("verify-credential-service")
 
-const (
-	revokedMsg = "revoked"
+var (
+	// ErrRevoked is returned when the credential is revoked.
+	ErrRevoked error = errors.New("revoked")
+	// ErrSuspended is returned when the credential is suspended.
+	ErrSuspended = errors.New("suspended")
 )
 
 type statusListVCURIResolver interface {
@@ -232,53 +236,70 @@ func (s *Service) validateSingleProof(
 	return nil
 }
 
-func (s *Service) ValidateVCStatus(ctx context.Context, vcStatus *verifiable.TypedID,
-	issuer *verifiable.Issuer) error {
-	vcStatusProcessor, err := s.vcStatusProcessorGetter(vc.StatusType(vcStatus.Type))
-	if err != nil {
-		return err
-	}
+func (s *Service) ValidateVCStatus(ctx context.Context, vcStatuses []*verifiable.TypedID, issuer *verifiable.Issuer) error {
+	for _, vcStatus := range vcStatuses {
+		vcStatusProcessor, err := s.vcStatusProcessorGetter(vc.StatusType(vcStatus.Type))
+		if err != nil {
+			return err
+		}
 
-	if err = vcStatusProcessor.ValidateStatus(vcStatus); err != nil {
-		return err
-	}
+		if err = vcStatusProcessor.ValidateStatus(vcStatus); err != nil {
+			return err
+		}
 
-	statusListIndex, err := vcStatusProcessor.GetStatusListIndex(vcStatus)
-	if err != nil {
-		return err
-	}
+		statusListIndex, err := vcStatusProcessor.GetStatusListIndex(vcStatus)
+		if err != nil {
+			return err
+		}
 
-	statusVCURL, err := vcStatusProcessor.GetStatusVCURI(vcStatus)
-	if err != nil {
-		return err
-	}
+		statusVCURL, err := vcStatusProcessor.GetStatusVCURI(vcStatus)
+		if err != nil {
+			return err
+		}
 
-	statusListVC, err := s.statusListVCURIResolver.Resolve(ctx, statusVCURL)
-	if err != nil {
-		return err
-	}
+		statusListVC, err := s.statusListVCURIResolver.Resolve(ctx, statusVCURL)
+		if err != nil {
+			return err
+		}
 
-	statusListVCC := statusListVC.Contents()
+		statusListVCC := statusListVC.Contents()
 
-	// TODO: check this on review. Previously we compared only issuer ids. So in case if both have empty issuers
-	// it still consider this as valid situation. Should we keep same behavior?
-	if statusListVCC.Issuer != nil && issuer != nil && statusListVCC.Issuer.ID != issuer.ID {
-		logger.Infoc(ctx, "issuer of the credential do not match status list vc issuer",
-			logfields.WithIssuerID(issuer.ID), logfields.WithStatusListIssuerID(statusListVCC.Issuer.ID))
+		// TODO: check this on review. Previously we compared only issuer ids. So in case if both have empty issuers
+		// it still consider this as valid situation. Should we keep same behavior?
+		if statusListVCC.Issuer != nil && issuer != nil && statusListVCC.Issuer.ID != issuer.ID {
+			logger.Infoc(ctx, "issuer of the credential do not match status list vc issuer",
+				logfields.WithIssuerID(issuer.ID), logfields.WithStatusListIssuerID(statusListVCC.Issuer.ID))
 
-		return fmt.Errorf("issuer of the credential do not match status list vc issuer")
-	}
+			return fmt.Errorf("issuer of the credential do not match status list vc issuer")
+		}
 
-	bitSet, err := vcStatusProcessor.IsSet(statusListVC, statusListIndex)
-	if err != nil {
-		return fmt.Errorf("failed to check if bit is set: %w", err)
-	}
+		bitSet, err := vcStatusProcessor.IsSet(statusListVC, statusListIndex)
+		if err != nil {
+			return fmt.Errorf("failed to check if bit is set: %w", err)
+		}
 
-	if bitSet {
-		return errors.New(revokedMsg)
+		if bitSet {
+			return getStatusError(vcStatusProcessor, vcStatus)
+		}
 	}
 
 	return nil
+}
+
+func getStatusError(vcStatusProcessor vc.StatusProcessor, vcStatus *verifiable.TypedID) error {
+	purpose, err := vcStatusProcessor.GetStatusPurpose(vcStatus)
+	if err != nil {
+		return err
+	}
+
+	switch purpose {
+	case statustype.StatusPurposeRevocation:
+		return ErrRevoked
+	case statustype.StatusPurposeSuspension:
+		return ErrSuspended
+	default:
+		return fmt.Errorf("unsupported status purpose: %s", purpose)
+	}
 }
 
 func (s *Service) getDataIntegrityVerifier() (*dataintegrity.Verifier, error) {

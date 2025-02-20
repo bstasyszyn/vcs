@@ -57,6 +57,8 @@ github.com/bits-and-blooms/bitset v1.17.0 h1:1X2TS7aHz1ELcC0yU1y2stUs/0ig5oMU6ST
 github.com/bits-and-blooms/bitset v1.17.0/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
 github.com/bluele/gcache v0.0.2 h1:WcbfdXICg7G/DGBh1PFfcirkWOQV+v077yF1pSy3DGw=
 github.com/bluele/gcache v0.0.2/go.mod h1:m15KV+ECjptwSPxKhOhQoAFQVtUFjTVkc3H8o0t/fp0=
+github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259 h1:vb5+hLhhQUPAyOFC15yHpvY/8wDnfxoq/kou5Rnkuo4=
+github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259/go.mod h1:/sVRjCQy3mehG4CJiX34kETp1xBzaiqq1sku3jjDNUI=
 github.com/btcsuite/btcd v0.20.1-beta h1:Ik4hyJqN8Jfyv3S4AGBOmyouMsYE3EdYODkMbQjwPGw=
 github.com/btcsuite/btcd v0.20.1-beta/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13Px/pDuV7OomQ=
 github.com/btcsuite/btcd/btcec/v2 v2.3.4 h1:3EJjcN70HCu/mwqlUsGK8GcNVyLVxFDlWurTXGPFfiQ=
@@ -476,8 +478,6 @@ github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d h1:uNTpELPH
 github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d/go.mod h1:bJf0bXx7Scf6Ya7a7DLRSoPIsbQklf5ZIpqHelRI47w=
 github.com/trustbloc/sidetree-go v1.0.1-0.20240219121130-f4260aff7104 h1:0IW4muaGvhjJ4OkG6/PQG3DGf5POWxlA1wwEYsxWQ+4=
 github.com/trustbloc/sidetree-go v1.0.1-0.20240219121130-f4260aff7104/go.mod h1:3yChjB5KOT7B9eZe0W1XaIx3MNUuC1Oe9nR/GCtI1W0=
-github.com/trustbloc/vc-go v1.3.2 h1:BOQnDZ4m1epJesm+2ORoDMGT7l9Q0sJj1VI7ro8Q9fY=
-github.com/trustbloc/vc-go v1.3.2/go.mod h1:/sVRjCQy3mehG4CJiX34kETp1xBzaiqq1sku3jjDNUI=
 github.com/urfave/negroni v1.0.0 h1:kIimOitoypq34K7TG7DUaJ9kq/N4Ofuwi1sjz0KipXc=
 github.com/urfave/negroni v1.0.0/go.mod h1:Meg73S6kFm/4PpbYdq35yYWoCZ9mS/YSx+lKnmiohz4=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=

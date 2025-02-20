@@ -36,6 +36,7 @@ import (
 
 	"github.com/trustbloc/vcs/pkg/doc/vc"
 	vccrypto "github.com/trustbloc/vcs/pkg/doc/vc/crypto"
+	"github.com/trustbloc/vcs/pkg/doc/vc/statustype"
 	"github.com/trustbloc/vcs/pkg/doc/vc/vcutil"
 	vcs "github.com/trustbloc/vcs/pkg/doc/verifiable"
 	"github.com/trustbloc/vcs/pkg/internal/testutil"
@@ -126,7 +127,7 @@ func TestService_IssueCredential(t *testing.T) {
 
 						mockVCStatusManager.EXPECT().
 							CreateStatusListEntry(
-								ctx, testProfileID, testProfileVersion, "urn:uuid:"+credential.Contents().ID).
+								ctx, testProfileID, testProfileVersion, "urn:uuid:"+credential.Contents().ID, statustype.StatusPurposeRevocation).
 							Times(1).Return(
 							&credentialstatus.StatusListEntry{
 								Context: "https://w3id.org/vc-revocation-list-2020/v1",
@@ -220,7 +221,7 @@ func TestService_IssueCredential(t *testing.T) {
 
 				mockVCStatusManager.EXPECT().
 					CreateStatusListEntry(
-						ctx, testProfileID, testProfileVersion, "urn:uuid:"+credential.Contents().ID).
+						ctx, testProfileID, testProfileVersion, "urn:uuid:"+credential.Contents().ID, statustype.StatusPurposeRevocation).
 					Times(1).Return(
 					&credentialstatus.StatusListEntry{
 						Context: "https://w3id.org/vc-revocation-list-2020/v1",
@@ -294,7 +295,7 @@ func TestService_IssueCredential(t *testing.T) {
 
 		vcStatusManager := NewMockVCStatusManager(gomock.NewController(t))
 		vcStatusManager.EXPECT().CreateStatusListEntry(
-			ctx, gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("some error"))
+			ctx, gomock.Any(), gomock.Any(), gomock.Any(), statustype.StatusPurposeRevocation).Return(nil, errors.New("some error"))
 
 		service := issuecredential.New(&issuecredential.Config{
 			KMSRegistry:     registry,
@@ -317,7 +318,7 @@ func TestService_IssueCredential(t *testing.T) {
 		kmRegistry.EXPECT().GetKeyManager(gomock.Any()).AnyTimes().Return(nil, nil)
 
 		vcStatusManager := NewMockVCStatusManager(gomock.NewController(t))
-		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(
+		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any(), statustype.StatusPurposeRevocation).AnyTimes().Return(
 			&credentialstatus.StatusListEntry{
 				Context: vcutil.DefVCContext,
 				TypedID: &verifiable.TypedID{
@@ -351,7 +352,7 @@ func TestService_IssueCredential(t *testing.T) {
 		kmRegistry.EXPECT().GetKeyManager(gomock.Any()).AnyTimes().Return(nil, nil)
 
 		vcStatusManager := NewMockVCStatusManager(gomock.NewController(t))
-		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(
+		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any(), statustype.StatusPurposeRevocation).AnyTimes().Return(
 			&credentialstatus.StatusListEntry{
 				Context: vcutil.DefVCContext,
 				TypedID: &verifiable.TypedID{
@@ -391,7 +392,7 @@ func TestService_IssueCredential(t *testing.T) {
 		kmRegistry.EXPECT().GetKeyManager(gomock.Any()).AnyTimes().Return(nil, nil)
 
 		vcStatusManager := NewMockVCStatusManager(gomock.NewController(t))
-		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(
+		vcStatusManager.EXPECT().CreateStatusListEntry(ctx, gomock.Any(), gomock.Any(), gomock.Any(), statustype.StatusPurposeRevocation).AnyTimes().Return(
 			&credentialstatus.StatusListEntry{
 				Context: vcutil.DefVCContext,
 				TypedID: &verifiable.TypedID{

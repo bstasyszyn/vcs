@@ -207,3 +207,5 @@ replace (
 	github.com/trustbloc/vcs/component/wallet-cli => ../../component/wallet-cli
 	github.com/trustbloc/vcs/test/stress => ../stress
 )
+
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259

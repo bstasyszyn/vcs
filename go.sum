@@ -81,6 +81,8 @@ github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
 github.com/bsm/gomega v1.27.10/go.mod h1:JyEr/xRbxbtgWNi8tIEVPUYZ5Dzef52k01W3YH0H+O0=
+github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259 h1:vb5+hLhhQUPAyOFC15yHpvY/8wDnfxoq/kou5Rnkuo4=
+github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259/go.mod h1:/sVRjCQy3mehG4CJiX34kETp1xBzaiqq1sku3jjDNUI=
 github.com/btcsuite/btcd v0.20.1-beta h1:Ik4hyJqN8Jfyv3S4AGBOmyouMsYE3EdYODkMbQjwPGw=
 github.com/btcsuite/btcd v0.20.1-beta/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13Px/pDuV7OomQ=
 github.com/btcsuite/btcd/btcec/v2 v2.3.4 h1:3EJjcN70HCu/mwqlUsGK8GcNVyLVxFDlWurTXGPFfiQ=
@@ -533,8 +535,6 @@ github.com/trustbloc/kms-go v1.2.1 h1:lwBv6/Xs2v/36xesaNeg9VpB5YFCwzqq8wS/8/zV4p
 github.com/trustbloc/kms-go v1.2.1/go.mod h1:ruI68jlF2X+v4c6EuN5Fg8qxJELOs16fV4DQuR7SZ/g=
 github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d h1:uNTpELPH6Wv0Q+YdzVXgZcGl+qbjFyMzLkU1dG9P5/M=
 github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d/go.mod h1:bJf0bXx7Scf6Ya7a7DLRSoPIsbQklf5ZIpqHelRI47w=
-github.com/trustbloc/vc-go v1.3.2 h1:BOQnDZ4m1epJesm+2ORoDMGT7l9Q0sJj1VI7ro8Q9fY=
-github.com/trustbloc/vc-go v1.3.2/go.mod h1:/sVRjCQy3mehG4CJiX34kETp1xBzaiqq1sku3jjDNUI=
 github.com/ugorji/go/codec v1.2.12 h1:9LC83zGrHhuUA9l16C9AHXAqEV/2wBQ4nkvumAE65EE=
 github.com/ugorji/go/codec v1.2.12/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/urfave/negroni v1.0.0 h1:kIimOitoypq34K7TG7DUaJ9kq/N4Ofuwi1sjz0KipXc=

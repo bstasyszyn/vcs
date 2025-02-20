@@ -180,3 +180,5 @@ replace (
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f => github.com/trustbloc/json-gold v0.5.2-0.20241206130328-d2135d9f36a8
 	github.com/trustbloc/vcs => ../../../../
 )
+
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259

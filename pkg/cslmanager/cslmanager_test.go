@@ -85,11 +85,11 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusID, err := s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err := s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatus(t, cslVCStore, statusID, listID, testProfile)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatus(t, cslVCStore, statusID, listID, testProfile)
 
@@ -98,11 +98,11 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatus(t, cslVCStore, statusID, updatedListID, testProfile)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatus(t, cslVCStore, statusID, updatedListID, testProfile)
 
@@ -112,7 +112,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatus(t, cslVCStore, statusID, updatedListIDSecond, testProfile)
 	})
@@ -152,11 +152,11 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusID, err := s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err := s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringVCStatus(t, cslVCStore, statusID, listID, testProfile)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringVCStatus(t, cslVCStore, statusID, listID, testProfile)
 
@@ -165,11 +165,11 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringVCStatus(t, cslVCStore, statusID, updatedListID, testProfile)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringVCStatus(t, cslVCStore, statusID, updatedListID, testProfile)
 
@@ -179,7 +179,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
 
-		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID)
+		statusID, err = s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringVCStatus(t, cslVCStore, statusID, updatedListIDSecond, testProfile)
 	})
@@ -206,7 +206,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to get KMS")
@@ -239,7 +239,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), profile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), profile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "unsupported VCStatusListType")
@@ -264,7 +264,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to get latestListID from store")
@@ -290,7 +290,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to get latestListID from store")
@@ -312,7 +312,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), profile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), profile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(),
@@ -346,7 +346,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(ctx, testProfile, credID)
+		status, err := s.CreateCSLEntry(ctx, testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to get CSL Index Wrapper from store(s): failed to store VC: some error")
@@ -369,7 +369,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "getUnusedIndex failed")
@@ -392,7 +392,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		cslURL, err := cslVCStore.GetCSLURL("https://localhost:8080", profile.GroupID, listID)
 		require.NoError(t, err)
 
-		csl, err := statusProcessor.CreateVC(cslURL, 2, &vc.Signer{DID: profile.SigningDID.DID})
+		csl, err := statusProcessor.CreateVC(cslURL, 2, "", &vc.Signer{DID: profile.SigningDID.DID})
 		require.NoError(t, err)
 
 		cslBytes, err := csl.MarshalJSON()
@@ -418,7 +418,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), profile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), profile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "getUnusedIndex failed")
@@ -444,7 +444,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to store CSL Index Wrapper: some error")
@@ -470,7 +470,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to store new list ID: some error")
@@ -501,7 +501,7 @@ func TestCredentialStatusList_CreateCSLEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID)
+		status, err := s.CreateCSLEntry(context.Background(), testProfile, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "failed to store credential status")

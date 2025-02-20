@@ -178,11 +178,11 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusID, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatusList2021Entry(t, s, statusID, listID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatusList2021Entry(t, s, statusID, listID)
 
@@ -191,11 +191,11 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatusList2021Entry(t, s, statusID, updatedListID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatusList2021Entry(t, s, statusID, updatedListID)
 
@@ -205,7 +205,7 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateVCStatusList2021Entry(t, s, statusID, updatedListIDSecond)
 	})
@@ -219,7 +219,7 @@ func TestCredentialStatusList_CreateStatusListEntry(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID)
+		status, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "get profile")
@@ -271,11 +271,11 @@ func TestCredentialStatusList_CreateStatusListEntry_Bitstring(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusID, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringStatusListEntry(t, s, statusID, listID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringStatusListEntry(t, s, statusID, listID)
 
@@ -284,11 +284,11 @@ func TestCredentialStatusList_CreateStatusListEntry_Bitstring(t *testing.T) {
 		require.NoError(t, err)
 		require.NotEqual(t, updatedListID, listID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringStatusListEntry(t, s, statusID, updatedListID)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringStatusListEntry(t, s, statusID, updatedListID)
 
@@ -298,7 +298,7 @@ func TestCredentialStatusList_CreateStatusListEntry_Bitstring(t *testing.T) {
 		require.NotEqual(t, updatedListID, updatedListIDSecond)
 		require.NotEqual(t, listID, updatedListIDSecond)
 
-		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusID, err = s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 		validateBitstringStatusListEntry(t, s, statusID, updatedListIDSecond)
 	})
@@ -312,7 +312,7 @@ func TestCredentialStatusList_CreateStatusListEntry_Bitstring(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		status, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID)
+		status, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.Error(t, err)
 		require.Nil(t, status)
 		require.Contains(t, err.Error(), "get profile")
@@ -417,7 +417,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusListEntry, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID)
+		statusListEntry, err := s.CreateStatusListEntry(ctx, profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 
 		err = mockVCStatusStore.Put(ctx, profileID, profileVersion, credID, statusListEntry.TypedID)
@@ -613,7 +613,11 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 
 		err = vcStore.Put(
 			context.Background(), profileID, profileVersion, credID,
-			&verifiable.TypedID{Type: string(vc.StatusList2021VCStatus)})
+			&verifiable.TypedID{
+				Type:         string(vc.StatusList2021VCStatus),
+				CustomFields: map[string]interface{}{"statusPurpose": statustype.StatusPurposeRevocation},
+			},
+		)
 		require.NoError(t, err)
 
 		params := credentialstatus.UpdateVCStatusParams{
@@ -827,7 +831,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusListEntry, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID)
+		statusListEntry, err := s.CreateStatusListEntry(context.Background(), profileID, profileVersion, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 
 		err = s.updateVCStatus(
@@ -893,7 +897,7 @@ func TestCredentialStatusList_UpdateVCStatus(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		statusListEntry, err := s.CreateStatusListEntry(context.Background(), profile.ID, profile.Version, credID)
+		statusListEntry, err := s.CreateStatusListEntry(context.Background(), profile.ID, profile.Version, credID, statustype.StatusPurposeRevocation)
 		require.NoError(t, err)
 
 		require.NoError(t, s.updateVCStatus(
@@ -1210,8 +1214,8 @@ func newMockVCStatusStore() *mockVCStore {
 	}
 }
 
-func (m *mockVCStore) Get(_ context.Context, profileID, profileVersion, vcID string) (*verifiable.TypedID, error) {
-	v, ok := m.s[fmt.Sprintf("%s_%s_%s", profileID, profileVersion, vcID)]
+func (m *mockVCStore) Get(_ context.Context, profileID, profileVersion, vcID, statusPurpose string) (*verifiable.TypedID, error) {
+	v, ok := m.s[fmt.Sprintf("%s_%s_%s_%s", profileID, profileVersion, vcID, statusPurpose)]
 	if !ok {
 		return nil, errors.New("data not found")
 	}
@@ -1228,7 +1232,7 @@ func (m *mockVCStore) Put(
 		return m.putErr
 	}
 
-	m.s[fmt.Sprintf("%s_%s_%s", profileID, profileVersion, credentialID)] = typedID
+	m.s[fmt.Sprintf("%s_%s_%s_%s", profileID, profileVersion, credentialID, typedID.CustomFields["statusPurpose"])] = typedID
 
 	return nil
 }

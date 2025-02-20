@@ -254,6 +254,8 @@ replace (
 	github.com/trustbloc/vcs/pkg/profile/reader => ../../component/profile/reader/file
 )
 
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20250219220235-d407d4aff259
+
 go 1.23
 
 toolchain go1.23.4
