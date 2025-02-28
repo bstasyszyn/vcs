@@ -110,7 +110,7 @@ func Test_statusList2021Processor_ValidateStatus(t *testing.T) {
 
 func Test_statusList2021Processor_CreateVC(t *testing.T) {
 	s := NewStatusList2021Processor()
-	vc, err := s.CreateVC("vcID1", 10, &vcapi.Signer{
+	vc, err := s.CreateVC("vcID1", 10, StatusPurposeRevocation, &vcapi.Signer{
 		DID:           "did:example:123",
 		SignatureType: vcsverifiable.JSONWebSignature2020,
 	})

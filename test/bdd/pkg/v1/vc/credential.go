@@ -207,7 +207,7 @@ func (e *Steps) verifyRevokedVC(profileVersionedID string) error {
 	}
 
 	if checks[0] != expectedCheck {
-		return fmt.Errorf("vc is not revoked. Cheks: %+v", checks)
+		return fmt.Errorf("vc is not revoked. Checks: %+v", checks)
 	}
 
 	return nil
