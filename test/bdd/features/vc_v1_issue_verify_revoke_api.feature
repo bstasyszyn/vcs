@@ -54,7 +54,7 @@ Feature: Using VC REST API
     And   V1 verifiable credential is verified under "<verifierProfile>" profile
 
     Then Profile "<wrongIssuerProfile>" issuer has been authorized with username "profile-user-issuer-1" and password "profile-user-issuer-1-pwd"
-    And V1 "<wrongIssuerProfile>" did unsuccessful attempt to revoke credential: "no documents in result"
+    And V1 "<wrongIssuerProfile>" did unsuccessful attempt to revoke credential: "not found"
     And   V1 verifiable credential is verified under "<verifierProfile>" profile
 
     Examples:

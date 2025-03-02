@@ -19,7 +19,7 @@ require (
 	github.com/trustbloc/kms-go v1.2.1
 	github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d
 	github.com/trustbloc/sidetree-go v1.0.1-0.20240219121130-f4260aff7104
-	github.com/trustbloc/vc-go v1.3.2
+	github.com/trustbloc/vc-go v1.3.3-0.20250228142415-3701dea69613
 	github.com/trustbloc/vcs v0.0.0-00010101000000-000000000000
 )
 
@@ -179,3 +179,5 @@ replace (
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f => github.com/trustbloc/json-gold v0.5.2-0.20241206130328-d2135d9f36a8
 	github.com/trustbloc/vcs => ../../
 )
+
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20250302182151-0d022c0c6621

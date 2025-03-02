@@ -14,8 +14,10 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/trustbloc/vc-go/verifiable"
+
 	"github.com/trustbloc/vcs/pkg/doc/vc"
 	"github.com/trustbloc/vcs/pkg/doc/vc/crypto"
+	"github.com/trustbloc/vcs/pkg/doc/vc/statustype"
 	"github.com/trustbloc/vcs/pkg/doc/vc/vcutil"
 	vcskms "github.com/trustbloc/vcs/pkg/kms"
 	profileapi "github.com/trustbloc/vcs/pkg/profile"
@@ -72,6 +74,7 @@ type vcStatusManager interface {
 		profileID profileapi.ID,
 		profileVersion profileapi.Version,
 		credentialID string,
+		statusPurpose string,
 	) (*credentialstatus.StatusListEntry, error)
 	StoreIssuedCredentialMetadata(
 		ctx context.Context,
@@ -142,16 +145,30 @@ func (s *Service) IssueCredential(
 	credential = credential.WithModifiedIssuer(vcutil.CreateIssuer(profile.SigningDID.DID, profile.Name))
 
 	if !profile.VCConfig.Status.Disable {
-		statusListEntry, err = s.vcStatusManager.CreateStatusListEntry(
-			ctx, profile.ID, profile.Version, credential.Contents().ID)
-		if err != nil {
-			return nil, fmt.Errorf("add credential status: %w", err)
+		var typeIDs []*verifiable.TypedID
+
+		purposes := lo.Uniq(profile.VCConfig.Status.Purpose)
+		if len(purposes) == 0 {
+			purposes = []string{statustype.DefaultStatusPurpose}
 		}
 
-		if !lo.Contains(credentialContext, statusListEntry.Context) {
-			credentialContext = append(credentialContext, statusListEntry.Context)
+		// Create a status list entry for each status purpose.
+		for _, purpose := range purposes {
+			statusListEntry, err = s.vcStatusManager.CreateStatusListEntry(
+				ctx, profile.ID, profile.Version, credential.Contents().ID, purpose,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("add credential status: %w", err)
+			}
+
+			if statusListEntry.Context != "" && !lo.Contains(credentialContext, statusListEntry.Context) {
+				credentialContext = append(credentialContext, statusListEntry.Context)
+			}
+
+			typeIDs = append(typeIDs, statusListEntry.TypedID)
 		}
-		credential = credential.WithModifiedStatus(statusListEntry.TypedID)
+
+		credential = credential.WithModifiedStatus(typeIDs...)
 	}
 
 	// update context

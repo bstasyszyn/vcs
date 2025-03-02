@@ -267,7 +267,7 @@ func Test_BitstringStatusListProcessor_ValidateStatus(t *testing.T) {
 
 func Test_BitstringStatusListProcessor_CreateVC(t *testing.T) {
 	s := NewBitstringStatusListProcessor()
-	vc, err := s.CreateVC("vcID1", 10, &vcapi.Signer{
+	vc, err := s.CreateVC("vcID1", 10, StatusPurposeRevocation, &vcapi.Signer{
 		DID:           "did:example:123",
 		SignatureType: vcsverifiable.Ed25519Signature2018,
 	})

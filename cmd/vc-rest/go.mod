@@ -25,7 +25,7 @@ require (
 	github.com/trustbloc/did-go v1.3.3
 	github.com/trustbloc/logutil-go v1.0.1-0.20250214202847-c43ef95f145d
 	github.com/trustbloc/sidetree-go v1.0.1-0.20240219121130-f4260aff7104
-	github.com/trustbloc/vc-go v1.3.2
+	github.com/trustbloc/vc-go v1.3.3-0.20250228142415-3701dea69613
 	github.com/trustbloc/vcs/component/echo v0.0.0-00010101000000-000000000000
 	github.com/trustbloc/vcs/component/otp v0.0.0-00010101000000-000000000000
 	go.mongodb.org/mongo-driver v1.16.1
@@ -253,6 +253,8 @@ replace (
 	github.com/trustbloc/vcs/component/otp => ../../component/otp
 	github.com/trustbloc/vcs/pkg/profile/reader => ../../component/profile/reader/file
 )
+
+replace github.com/trustbloc/vc-go => github.com/bstasyszyn/vc-go v0.0.0-20250302182151-0d022c0c6621
 
 go 1.23
 
