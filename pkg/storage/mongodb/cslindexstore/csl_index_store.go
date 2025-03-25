@@ -88,9 +88,9 @@ func (p *Store) Get(ctx context.Context, cslURL string) (*credentialstatus.CSLIn
 	return cslWrapper, nil
 }
 
-func (p *Store) UpdateLatestListID(ctx context.Context, id credentialstatus.ListID) error {
+func (p *Store) UpdateLatestListID(ctx context.Context, id credentialstatus.ListID, statusPurpose string) error {
 	collection := p.mongoClient.Database().Collection(cslIndexStoreName)
-	_, err := collection.UpdateByID(ctx, latestListIDDBEntryKey, bson.M{
+	_, err := collection.UpdateByID(ctx, getLatestListIDDBEntryKey(statusPurpose), bson.M{
 		"$set": latestListIDDocument{
 			ListID: string(id),
 		},
@@ -99,15 +99,17 @@ func (p *Store) UpdateLatestListID(ctx context.Context, id credentialstatus.List
 	return err
 }
 
-func (p *Store) GetLatestListID(ctx context.Context) (credentialstatus.ListID, error) {
+func (p *Store) GetLatestListID(ctx context.Context, statusPurpose string) (credentialstatus.ListID, error) {
 	collection := p.mongoClient.Database().Collection(cslIndexStoreName)
 
 	mongoDBDocument := map[string]interface{}{}
 
 	err := collection.FindOne(ctx,
-		bson.M{mongoDBDocumentIDFieldName: latestListIDDBEntryKey}).Decode(mongoDBDocument)
+		bson.M{
+			mongoDBDocumentIDFieldName: getLatestListIDDBEntryKey(statusPurpose),
+		}).Decode(mongoDBDocument)
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return p.createFirstListID(ctx)
+		return p.createFirstListID(ctx, statusPurpose)
 	}
 
 	if err != nil {
@@ -124,12 +126,12 @@ func (p *Store) GetLatestListID(ctx context.Context) (credentialstatus.ListID, e
 	return credentialstatus.ListID(latestListID.ListID), nil
 }
 
-func (p *Store) createFirstListID(ctx context.Context) (credentialstatus.ListID, error) {
+func (p *Store) createFirstListID(ctx context.Context, statusPurpose string) (credentialstatus.ListID, error) {
 	listID := uuid.NewString()
 
 	collection := p.mongoClient.Database().Collection(cslIndexStoreName)
 	_, err := collection.InsertOne(ctx, latestListIDDocument{
-		ID:     latestListIDDBEntryKey,
+		ID:     getLatestListIDDBEntryKey(statusPurpose),
 		ListID: listID,
 	})
 	if err != nil {
@@ -137,4 +139,8 @@ func (p *Store) createFirstListID(ctx context.Context) (credentialstatus.ListID,
 	}
 
 	return credentialstatus.ListID(listID), nil
+}
+
+func getLatestListIDDBEntryKey(statusPurpose string) string {
+	return fmt.Sprintf("%s-%s", latestListIDDBEntryKey, statusPurpose)
 }

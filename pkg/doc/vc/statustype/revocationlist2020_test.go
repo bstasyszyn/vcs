@@ -94,10 +94,12 @@ func Test_revocationList2020Processor_ValidateStatus(t *testing.T) {
 
 func Test_revocationList2020Processor_CreateVC(t *testing.T) {
 	s := NewRevocationList2020Processor()
-	vc, err := s.CreateVC("vcID1", 10, &vcapi.Signer{
+	vc, err := s.CreateVC("vcID1", 10, StatusPurposeRevocation, &vcapi.Signer{
 		DID:           "did:example:123",
 		SignatureType: vcsverifiable.JSONWebSignature2020,
 	})
+	require.NoError(t, err)
+
 	vcc := vc.Contents()
 
 	require.NoError(t, err)

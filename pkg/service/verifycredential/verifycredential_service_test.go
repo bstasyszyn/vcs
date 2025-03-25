@@ -311,7 +311,7 @@ func TestService_checkVCStatus(t *testing.T) {
 		getVCStatusProcessorGetter func() vc.StatusProcessorGetter
 	}
 	type args struct {
-		getVcStatus func() *verifiable.TypedID
+		getVcStatus func() []*verifiable.TypedID
 		issuer      *verifiable.Issuer
 	}
 	tests := []struct {
@@ -355,8 +355,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return validVCStatus
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{validVCStatus}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},
@@ -377,8 +377,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return &verifiable.TypedID{}
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{{}}
 				},
 			},
 			wantErr: true,
@@ -400,8 +400,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return &verifiable.TypedID{}
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{{}}
 				},
 			},
 			wantErr: true,
@@ -423,8 +423,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return &verifiable.TypedID{}
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{{}}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},
@@ -447,8 +447,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return &verifiable.TypedID{}
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{{}}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},
@@ -472,8 +472,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return validVCStatus
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{validVCStatus}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},
@@ -504,8 +504,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return validVCStatus
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{validVCStatus}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},
@@ -545,8 +545,8 @@ func TestService_checkVCStatus(t *testing.T) {
 				},
 			},
 			args: args{
-				getVcStatus: func() *verifiable.TypedID {
-					return &verifiable.TypedID{
+				getVcStatus: func() []*verifiable.TypedID {
+					return []*verifiable.TypedID{{
 						ID:   "https://issuer-vcs.sandbox.trustbloc.dev/vc-issuer-test-2/status/1#0",
 						Type: "StatusList2021Entry",
 						CustomFields: map[string]interface{}{
@@ -554,7 +554,7 @@ func TestService_checkVCStatus(t *testing.T) {
 							"statusListCredential": "",
 							"statusPurpose":        "2",
 						},
-					}
+					}}
 				},
 				issuer: &verifiable.Issuer{ID: "did:trustblock:abc"},
 			},

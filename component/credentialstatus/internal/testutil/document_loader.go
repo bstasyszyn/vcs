@@ -21,6 +21,8 @@ import (
 var (
 	//go:embed contexts/credentials-examples_v1.jsonld
 	credentialExamples []byte
+	//go:embed contexts/credentials-examples_v2.jsonld
+	credentialExamplesV2 []byte
 	//go:embed contexts/examples_v1.jsonld
 	vcExamples []byte
 	//go:embed contexts/odrl.jsonld
@@ -59,6 +61,10 @@ func DocumentLoader(t *testing.T, extraContexts ...ldcontext.Document) *document
 		ldcontext.Document{
 			URL:     "https://www.w3.org/2018/credentials/examples/v1",
 			Content: credentialExamples,
+		},
+		{
+			URL:     "https://www.w3.org/ns/credentials/examples/v2",
+			Content: credentialExamplesV2,
 		},
 		ldcontext.Document{
 			URL:     "https://trustbloc.github.io/context/vc/examples-v1.jsonld",
