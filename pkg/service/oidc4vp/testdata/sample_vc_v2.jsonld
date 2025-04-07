@@ -5,6 +5,22 @@
   ],
   "validFrom": "2019-12-03T12:19:52Z",
   "validUntil": "2029-12-03T12:19:52Z",
+  "credentialStatus": [
+    {
+      "id": "https://issuer-vcs.sandbox.trustbloc.dev/vc-issuer-test-2/status/1#0",
+      "type": "BitstringStatusListEntry",
+      "statusListIndex": "1",
+      "statusListCredential": "",
+      "statusPurpose": "revocation"
+    },
+    {
+      "id": "https://issuer-vcs.sandbox.trustbloc.dev/vc-issuer-test-2/status/2#0",
+      "type": "BitstringStatusListEntry",
+      "statusListIndex": "1",
+      "statusListCredential": "",
+      "statusPurpose": "suspension"
+    }
+  ],
   "credentialSubject": {
     "image": "data:image/png;base64,iVBORw0KGgo...kJggg==",
     "lprNumber": "999-999-999",

@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
 	"time"
@@ -1360,7 +1361,7 @@ func TestService_RetrieveClaims(t *testing.T) {
 			verifiable.WithJSONLDDocumentLoader(loader),
 			verifiable.WithDisabledProofCheck())
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		claims := svc.RetrieveClaims(context.Background(), &oidc4vp.Transaction{
 			ReceivedClaims: &oidc4vp.ReceivedClaims{Credentials: []*verifiable.Credential{

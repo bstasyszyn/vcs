@@ -197,6 +197,7 @@ func (s *Service) UpdateVCStatus(ctx context.Context, params credentialstatus.Up
 
 	typedID, err := s.vcStatusStore.Get(ctx, profile.ID, profile.Version, params.CredentialID, statusPurpose)
 	if err != nil {
+		// TODO: Should have better error message indicating that this credential does not support a specific status purpose.
 		return oidc4cierr.NewBadRequestError(err).WithErrorPrefix("vcStatusStore.Get")
 	}
 

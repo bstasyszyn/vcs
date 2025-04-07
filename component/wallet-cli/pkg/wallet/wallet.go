@@ -453,11 +453,25 @@ func (w *Wallet) Query(
 		return nil, nil, err
 	}
 
+	for i, cred := range credentials {
+		credBytes, _ := json.MarshalIndent(cred, "", "  ")
+
+		fmt.Printf("***** Credential %d:\n", i+1)
+		fmt.Println(string(credBytes))
+		fmt.Printf("***** Credential contents %d:\n", i+1)
+		fmt.Printf("%+v\n", i+1, cred)
+		fmt.Println("*****")
+	}
+
 	var pd presexch.PresentationDefinition
 
 	if err = json.Unmarshal(pdBytes, &pd); err != nil {
 		return nil, nil, err
 	}
+
+	fmt.Println("***** Presentation Definition:")
+	fmt.Println(string(pdBytes))
+	fmt.Println("*****")
 
 	opts := []presexch.MatchRequirementsOpt{
 		presexch.WithSDCredentialOptions(
@@ -474,7 +488,7 @@ func (w *Wallet) Query(
 		vps, presentationSubmission, createErr := pd.CreateVPArray(credentials, w.documentLoader, opts...)
 		if createErr != nil {
 			if errors.Is(createErr, presexch.ErrNoCredentials) {
-				return nil, nil, fmt.Errorf("no matching credentials found")
+				return nil, nil, fmt.Errorf("no matching credentials found with multiple VPs")
 			}
 
 			return nil, nil, createErr
